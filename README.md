@@ -346,14 +346,14 @@ This above document shows that:
 
 These concepts are expressed differently in different languages:
 
-concept         | JSON              | Python                | JS            | go
-----------------------------------------------------------------------------------------------
-empty number    | `0`               | `Decimal("0")` or `0` | `0`           | `decimal.NewFromInt(3)` or `0`
-empty list      | `[]`              | `[]`                  | `[]`          | `make([]string, 0)`
-empty object    | `{}`              | `{}`                  | `{}`          | `map[string]string{}{}`
-empty string    | `""`              | `""`                  | `''` or `""`  | `""`
-non-existance   | (field missing)   |                       | `undefined`   | 
-null / unknown  | `null`            | `None`                | `null`        |
+| concept         | JSON              | Python                | JS            | go                 |
+| --------------- | ----------------- | --------------------- | ------------- | ------------------ |
+| empty number    | `0`               | `Decimal("0")` or `0` | `0`           | `decimal.NewFromInt(3)` or `0` |
+| empty list      | `[]`              | `[]`                  | `[]`          | `make([]string, 0)` |
+| empty object    | `{}`              | `{}`                  | `{}`          | `map[string]string{}{}` |
+| empty string    | `""`              | `""`                  | `''` or `""`  | `""` |
+| non-existance   | (field missing)   |                       | `undefined`   |  |
+| null / unknown  | `null`            | `None`                | `null`        |  |
 
 Python does not have a positive means of noting non-existance. However `obj.has_key(key)` can detect existance. And `del obj[key]` can remove existance.
 
@@ -380,11 +380,11 @@ For many applications, this is a subtle distinction that does not mean much and 
 
 Not all programming languages support decimal numbers. Some helpful references:
 
-language    | ref
-----------------------------------
-Python      | there is a standard library called 'decimal'
-JavaScript  | https://www.npmjs.com/package/js-big-decimal
-Go          | https://pkg.go.dev/github.com/shopspring/decimal
+| language    | ref |
+| ----------- | --------------------- |
+| Python      | there is a standard library called 'decimal' |
+| JavaScript  | https://www.npmjs.com/package/js-big-decimal |
+| Go          | https://pkg.go.dev/github.com/shopspring/decimal |
 
 ### A JSON document's root element must either be an object or array
 
@@ -647,13 +647,13 @@ Or, to show it visibly. The RJSON doc:
 }
 ```
 
-is 58 bytes long. It is larger than minified JSON with the same content:
+is 58 bytes long. This includes the final LINEFEED. It is larger than minified JSON with the same content:
 
 ```json
 {"a":4948,"b":223,"c":false,"d":"jerry"}
 ```
 
-which is only 40 characters long.
+which is only 40 bytes long.
 
 For larger objects with greater indentation, the descrepancy can get much worse. These larger sizes will likely have an impact on performance.
 
