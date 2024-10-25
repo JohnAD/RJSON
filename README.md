@@ -25,16 +25,14 @@ Because RJSON is about the expression of standard JSON, the libraries need only 
 
 However, it is my intention to also write a linter in Go.
 
-## Methodology
+The goals are to be met by a set of rules that:
 
-The goals are met by:
+* state the standard for layout and indentiation, and
+* more precisely stating definitions of some elements.
 
-* stating the standard for layout and indentiation
-* More-precise definitions of some elements
+## The Rules
 
-### Standard for Layout and Indentation
-
-#### For objects and array entries, indentation is two spaces and ONLY two spaces.
+### For objects and array entries, indentation is two spaces and ONLY two spaces.
 
 Good:
 
@@ -60,7 +58,7 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-#### Form for object entries: indentation, field name (key), colon, exactly one space, start of value. 
+### Form for object entries: indentation, field name (key), colon, exactly one space, start of value. 
 
 Good:
 
@@ -90,7 +88,7 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-#### For object and arrays entries, the end of a value ends the line (via LINEFEED or COMMA LINEFEED) 
+### For object and arrays entries, the end of a value ends the line (via LINEFEED or COMMA LINEFEED) 
 
 Good:
 
@@ -134,11 +132,11 @@ Bad RJSON (even though valid JSON):
 
 Not shown: adding white space at end of line also not allowed. But this is difficult to demonstrate using markdown.
 
-#### All whitespace is unicode XX and all lines are terminated with a single linefeed character unicode NN (\n)
+### All whitespace is unicode 'SPACE' U+0020 and all lines are terminated with a single 'LINE FEED' unicode U+000A (`\n`)
 
 The JSON spec allows for `carriage returns` and `tabs`, however RJSON never uses those in it's expression.
 
-#### An empty object is represented by {} and an empty array by []
+### An empty object is represented by `{}` and an empty array by `[]`
 
 Good:
 
@@ -167,7 +165,7 @@ Bad:
 }
 ```
 
-#### Object field names (keys) start on the same line as the start of the value.
+### Object field names (keys) start on the same line as the start of the value.
 
 Good:
 
@@ -205,7 +203,7 @@ Good:
 }
 ```
 
-#### Numbers use a capital E if using an exponent
+### Numbers use a capital E if using an exponent
 
 Good:
 
@@ -223,7 +221,7 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-#### Numbers do not use the plus symbol if using a positive exponent
+### Numbers do not use the plus symbol if using a positive exponent
 
 Good:
 
@@ -251,7 +249,7 @@ Bad RJSON and bad JSON:
   "number": +2.345E20
 ```
 
-#### All documents end with LINEFEED
+### All documents end with LINEFEED
 
 The last character in a document or the general expresson of RJSON should be a single LINEFEED character.
 
@@ -259,7 +257,7 @@ The last character in a document or the general expresson of RJSON should be a s
 
 The JSON spec leaves the meaning of certain things open to interpretation. RJSON defines some meanings more explicitly:
 
-#### Arrays are actually "lists" not "arrays"
+### Arrays are actually "lists" not "arrays"
 
 In Computer Science standard terminology, an "array" is a fixed list of items of the same type. However, in JSON, an "array" is neither fixed nor is it required to be of the same type. Yet is called an "array" for historic reasons: the javascript language also calls them arrays despite not being actual arrays.
 
@@ -299,7 +297,7 @@ Here is a valid RJSON document with mixed types in the field "aaa":
 }
 ```
 
-#### `null` represents "not known" or "unknown"
+### `null` represents "not known" or "unknown"
 
 In RJSON, `null` very specifically represents the database meaning commonly found in SQL specifications. It means that a value is not known. Or, to be explicit: it does NOT mean empty or does-not-exist.
 
@@ -342,7 +340,7 @@ C supports `NIL` but that distinctly a different thing: a pointer with no refere
 * If a field *does not exist* when it was read, and no change is made to that field, it *should not exist* when it is written.
 * If a field is `null` when it was read, and no change is made to that field, it should be `null` when it is written.
 
-#### Numbers are in decimal not binary
+### Numbers are in decimal not binary
 
 The JSON spec explicitly defines a "number" as involving the Base10 digits 0 to 9. It does not support Binary (Base2) or Hex (Base16 aka Base2^4). For integers, this is not critical. But for floating numbers, a binary floating point number cannot store the full set of numbers expressed by decimal floating point numbers. For example, one-fifth (1/5) is "0.2" in decimal. But in binary, one-fifth is a repeating number and can only be approximated. This is very similar to how one-third is a repeating number in decimal (0.3333...) and can only be stored as an approximation in decimal.
 
@@ -360,7 +358,7 @@ Python      | there is a standard library called 'decimal'
 JavaScript  | https://www.npmjs.com/package/js-big-decimal
 Go          | https://pkg.go.dev/github.com/shopspring/decimal
 
-#### A JSON document's root element must either be an object or array
+### A JSON document's root element must either be an object or array
 
 The JSON spec sort-of kind-of implies this. But RJSON is more explicit: the top-level structure is either an object or an array.
 
@@ -415,7 +413,7 @@ Bad RJSON (and possibly bad JSON, but we are not sure):
 true
 ```
 
-#### An Object's field names may not repeat in the same level of that object
+### An Object's field names may not repeat in the same level of that object
 
 Good:
 
@@ -468,7 +466,7 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-#### In a string value, the `\U` escapement is not to be used.
+### In a string value, the `\U` escapement is not to be used.
 
 The actual UTF-8 codepoints are to be inserted into the string.
 
@@ -488,7 +486,7 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-#### Defining a repeatable order for the fields of an unordered object
+### Defining a repeatable order for the fields of an unordered object
 
 The items in a JSON object are not placed in a particular order per the JSON spec.
 
