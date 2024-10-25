@@ -13,6 +13,11 @@ In order of importance:
 
 Easy human *writability* is NOT a goal. It should be fairly easy for a person to read RJSON; but writing is very strict. Enough so that having a human write anything non-trivial in RJSON is going to be frustrating.
 
+The goals are to be met by a set of rules that:
+
+* state the standard for layout and indentiation, and
+* more precisely stating definitions of some elements.
+
 ## Target Libraries
 
 1. Javascript
@@ -24,11 +29,6 @@ It would be good for support in other languages, but this author is concentratin
 Because RJSON is about the expression of standard JSON, the libraries need only influence the serialization. There is no need for handling deserialization.
 
 However, it is my intention to also write a linter in Go.
-
-The goals are to be met by a set of rules that:
-
-* state the standard for layout and indentiation, and
-* more precisely stating definitions of some elements.
 
 ## The Rules
 
@@ -147,7 +147,7 @@ Good:
 }
 ```
 
-Bad:
+Bad RJSON (even though valid JSON):
 
 ```json
 {
@@ -155,6 +155,8 @@ Bad:
   "bar": [ ]
 }
 ```
+
+*A space between left and right brackets is not allowed.*
 
 ```json
 {
@@ -164,6 +166,8 @@ Bad:
   ]
 }
 ```
+
+*If empty, an object or array cannot span lines.*
 
 ### Object field names (keys) start on the same line as the start of the value.
 
@@ -181,6 +185,7 @@ Good:
 }
 ```
 
+Bad RJSON (even though valid JSON):
 
 ```json
 {
@@ -189,6 +194,8 @@ Good:
   "zzz": { "a": 99 }
 }
 ```
+
+*Even if small, non-empty arrays and objects span multiple lines and are indented.*
 
 ```json
 {
@@ -202,6 +209,8 @@ Good:
   }
 }
 ```
+
+*Event if a name/value combination is long, the value must start on the same line as the name. In the case of a string value, the whole name/value pair will be on one line.*
 
 ### Numbers use a capital E if using an exponent
 
@@ -220,6 +229,8 @@ Bad RJSON (even though valid JSON):
   "number": 2.345e20
 }
 ```
+
+*Do not use a lower-case 'e' for the exponent marker.*
 
 ### Numbers do not use the plus symbol if using a positive exponent
 
@@ -241,17 +252,19 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-The JSON spec already forbids using a plus symbol for simply positive numbers.
+*The +20 for an exponent is allowed with JSON but not RJSON*
 
-Bad RJSON and bad JSON:
+Bad RJSON **and** bad JSON:
 
 ```json
   "number": +2.345E20
 ```
 
+*The JSON spec already forbids using a plus symbol for positive numbers.*
+
 ### All documents end with LINEFEED
 
-The last character in a document or the general expresson of RJSON should be a single LINEFEED character.
+The last character in a document or the general expresson of RJSON should be a single LINEFEED character following the closure of the document's root array or object.
 
 ### More-precise definitions of some elements
 
@@ -259,7 +272,7 @@ The JSON spec leaves the meaning of certain things open to interpretation. RJSON
 
 ### Arrays are actually "lists" not "arrays"
 
-In Computer Science standard terminology, an "array" is a fixed list of items of the same type. However, in JSON, an "array" is neither fixed nor is it required to be of the same type. Yet is called an "array" for historic reasons: the javascript language also calls them arrays despite not being actual arrays.
+In Computer Science standard terminology, an "array" is a fixed list of items of the same type. However, in JSON, an "array" is neither fixed nor is it required to be of the same type. Ity is called an "array" for historic reasons: the javascript language also calls them arrays despite not being actual arrays.
 
 Here are two valid RJSON documents with differening sizes for the field "aaa":
 
