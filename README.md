@@ -357,7 +357,7 @@ These concepts are expressed differently in different languages:
 
 Python does not have a positive means of noting non-existance. However `obj.has_key(key)` can detect existance. And `del obj[key]` can remove existance.
 
-Go does not have a positive means of notating unknown vs non-existance. Often `nil` will be used to indicate either of those concepts, but `nil` really means "undefined pointer". Extra effort must be taken during marshalling/unmarshalling.
+Go does not have a positive means of notating unknown vs non-existance. Often `nil` will be used to indicate either of those concepts, but `nil` really means "undefined pointer". Extra effort must be taken during marshalling/unmarshalling. Also see 'omitempty' handling.
 
 Sadly, some languages, such as C#, have standard libraries that treat unknown and non-existance as the same thing leading to possible security vulnerabilities. (ref) Writing a RJSON library in that language will be ... challenging.
 
@@ -372,7 +372,7 @@ C supports `NIL` but that distinctly a different thing: a pointer with no refere
 
 The JSON spec explicitly defines a "number" as involving the Base10 digits 0 to 9. It does not support Binary (Base2) or Hex (Base16 aka Base2^4). For integers, this is not critical. But for floating numbers, a binary floating point number cannot store the full set of numbers expressed by decimal floating point numbers. For example, one-fifth (1/5) is "0.2" in decimal. But in binary, one-fifth is a repeating number and can only be approximated. This is very similar to how one-third is a repeating number in decimal (0.3333...) and can only be stored as an approximation in decimal.
 
-(Trivia: one-third CAN be precisely be stored in the sexagesimal. That is the numbering used by the extinct civilization of Ur. Their numbering is Base60. However, one-seventh is a repeating number in sexagesimal. No numbering system can prevent all divisor flaws; but that is a mathematical discussion well outside the scope of this document.)
+(Trivia: one-third CAN be precisely be stored in Sumerian sexagesimal as ` .𒌋𒌋` (note the space before the period to denote nothing/zero.) That is the numbering system used by the extinct civilization of Ur. The numbering is Base60. However, one-seventh is a repeating number in sexagesimal. No numbering system can prevent all divisor flaws; but that is a mathematical discussion well outside the scope of this document.)
 
 This gives way to "subtle" rounding errors when converting between the decimal to binary.
 
@@ -514,7 +514,7 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-### Defining a repeatable order for the fields of an unordered object
+### Defining a repeatable order for the fields of an object
 
 The items in a JSON object are not placed in a particular order per the JSON spec.
 
