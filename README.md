@@ -262,6 +262,21 @@ Bad RJSON **and** bad JSON:
 
 *The JSON spec already forbids using a plus symbol for positive numbers.*
 
+### If reading/writing RJSON documents, Number precision must be preserved.
+
+Decimal floating-point numbers have implied precision and it should not be discarded. For example:
+
+```json
+{
+  "a": 1,
+  "b": 1.000,
+  "c": 3.1415E20,
+  "d": 3.14150000E20,
+}
+```
+
+The values for "a", "b", "c", and "d" are different. "a" is exactly 1 but "b" is 1 to three decimal points. They may both have the same scalar value, but the precision (or *significance*) differs.
+
 ### All documents end with LINEFEED
 
 The last character in a document or the general expresson of RJSON should be a single LINEFEED character following the closure of the document's root array or object.
