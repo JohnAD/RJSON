@@ -281,9 +281,6 @@ The values for "a", "b", "c", and "d" are different. "a" is exactly 1 but "b" is
 
 The last character in a document or the general expresson of RJSON should be a single LINEFEED character following the closure of the document's root array or object.
 
-### More-precise definitions of some elements
-
-The JSON spec leaves the meaning of certain things open to interpretation. RJSON defines some meanings more explicitly:
 
 ### Arrays are actually "lists" not "arrays"
 
@@ -494,7 +491,9 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-### In a string value, the `\U` escapement is not to be used.
+This *might* seem like this rule violates rule #1: "Compatible with the JSON spec." However, it is this authors contention that it does not. If curious, I've discussed this subject in FAR TOO MUCH DETAIL in another document: [JSON_DUPLICATE_NAMES](JSON_DUPLICATE_NAMES.md)
+
+### In a string, the `\U` escapement is not to be used.
 
 The actual UTF-8 codepoints are to be inserted into the string.
 
@@ -513,6 +512,16 @@ Bad RJSON (even though valid JSON):
   "greeting": "hello \u9c8d\u52c3"
 }
 ```
+
+*You must choose to use the actual codepoints, not the escaped equivalents.*
+
+```json
+{
+  "greetin\u0067": "hello 鲍勃"
+}
+```
+
+*This rule applies to the name string as well.*
 
 ### Defining a repeatable order for the fields of an object
 
