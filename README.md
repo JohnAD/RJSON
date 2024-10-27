@@ -32,7 +32,7 @@ However, it is my intention to also write a linter in Go.
 
 ## The Rules
 
-### For objects and array entries, indentation is two spaces and ONLY two spaces.
+### `FORMATTING 1` - For objects and array entries, indentation is two spaces and ONLY two spaces.
 
 Good:
 
@@ -58,7 +58,7 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-### Form for object entries: indentation, field name (key), colon, exactly one space, start of value. 
+### `FORMATTING 2` - For object key/value pair lines: indentation, field name (key), colon, exactly one space, start of value. 
 
 Good:
 
@@ -88,7 +88,7 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-### For object and arrays entries, the end of a value ends the line (via LINEFEED or COMMA LINEFEED) 
+### `FORMATTING 3` - For object and arrays entries, the end of a value ends the line (via LINEFEED or COMMA LINEFEED) 
 
 Good:
 
@@ -132,11 +132,11 @@ Bad RJSON (even though valid JSON):
 
 Not shown: adding white space at end of line also not allowed. But this is difficult to demonstrate using markdown.
 
-### All whitespace is unicode 'SPACE' U+0020 and all lines are terminated with a single 'LINE FEED' unicode U+000A (`\n`)
+### `FORMATTING 4` - All whitespace is unicode 'SPACE' U+0020 and all lines are terminated with a single 'LINE FEED' unicode U+000A (`\n`)
 
 The JSON spec allows for `carriage returns` and `tabs`, however RJSON never uses those in it's expression.
 
-### An empty object is represented by `{}` and an empty array by `[]`
+### `FORMATTING 5` - An empty object is represented by `{}` and an empty array by `[]`
 
 Good:
 
@@ -169,7 +169,7 @@ Bad RJSON (even though valid JSON):
 
 *If empty, an object or array cannot span lines.*
 
-### Object field names (keys) start on the same line as the start of the value.
+### `FORMATTING 6` - Object field names (keys) start on the same line as the start of the value.
 
 Good:
 
@@ -212,178 +212,21 @@ Bad RJSON (even though valid JSON):
 
 *Event if a name/value combination is long, the value must start on the same line as the name. In the case of a string value, the whole name/value pair will be on one line.*
 
-### Numbers use a capital E if using an exponent
-
-Good:
-
-```json
-{
-  "number": 2.345E20
-}
-```
-
-Bad RJSON (even though valid JSON):
-
-```json
-{
-  "number": 2.345e20
-}
-```
-
-*Do not use a lower-case 'e' for the exponent marker.*
-
-### Numbers do not use the plus symbol if using a positive exponent
-
-Good:
-
-```json
-{
-  "number": 2.345E20,
-  "small": 4.56E-10
-}
-```
-
-Bad RJSON (even though valid JSON):
-
-```json
-{
-  "number": 2.345E+20,
-  "small": 4.56E-10
-}
-```
-
-*The +20 for an exponent is allowed with JSON but not RJSON*
-
-Bad RJSON **and** bad JSON:
-
-```json
-  "number": +2.345E20
-```
-
-*The JSON spec already forbids using a plus symbol for positive numbers.*
-
-### If reading/writing RJSON documents, Number precision must be preserved.
-
-Decimal floating-point numbers have implied precision and it should not be discarded. For example:
-
-```json
-{
-  "a": 1,
-  "b": 1.000,
-  "c": 3.1415E20,
-  "d": 3.14150000E20,
-}
-```
-
-The values for "a", "b", "c", and "d" are different. "a" is exactly 1 but "b" is 1 to three decimal points. They may both have the same scalar value, but the precision (or *significance*) differs.
-
-### All documents end with LINEFEED
+### `FORMATTING 6` - All documents end with LINEFEED
 
 The last character in a document or the general expresson of RJSON should be a single LINEFEED character following the closure of the document's root array or object.
 
-
-### Arrays are actually "lists" not "arrays"
-
-In Computer Science standard terminology, an "array" is a fixed list of items of the same type. However, in JSON, an "array" is neither fixed nor is it required to be of the same type. Ity is called an "array" for historic reasons: the javascript language also calls them arrays despite not being actual arrays.
-
-Here are two valid RJSON documents with differening sizes for the field "aaa":
+As an example, the RJSON document
 
 ```json
 {
-  "aaa": [
-    1,
-    2,
-    3
-  ]
+  "foo": "bar"
 }
 ```
 
-```json
-{
-  "aaa": [
-    1,
-    2,
-    3,
-    4
-  ]
-}
-```
+contains 3 lines and a LINEFEED character at the end of each line. So, a total of 3 LINEFEED characters.
 
-Here is a valid RJSON document with mixed types in the field "aaa":
-
-```json
-{
-  "aaa": [
-    1,
-    null,
-    "hello",
-    false
-  ]
-}
-```
-
-### `null` represents "not known" or "unknown"
-
-In RJSON, `null` very specifically represents the database meaning commonly found in SQL specifications. It means that a value is not known. Or, to be explicit: it does NOT mean empty or does-not-exist.
-
-As a demonstration:
-
-```json
-{
-  "a": 0,
-  "c": null
-}
-```
-
-This above document shows that:
-
-- "a" is an empty integer. 
-- "b" does not exist. (aka "missing" or "undefined")
-- "c" is not known.
-
-These concepts are expressed differently in different languages:
-
-| concept         | JSON              | Python                | JS            | go                 |
-| --------------- | ----------------- | --------------------- | ------------- | ------------------ |
-| empty number    | `0`               | `Decimal("0")` or `0` | `0`           | `decimal.NewFromInt(3)` or `0` |
-| empty list      | `[]`              | `[]`                  | `[]`          | `make([]string, 0)` |
-| empty object    | `{}`              | `{}`                  | `{}`          | `map[string]string{}{}` |
-| empty string    | `""`              | `""`                  | `''` or `""`  | `""` |
-| non-existance   | (field missing)   |                       | `undefined`   |  |
-| null / unknown  | `null`            | `None`                | `null`        |  |
-
-Python does not have a positive means of noting non-existance. However `obj.has_key(key)` can detect existance. And `del obj[key]` can remove existance.
-
-Go does not have a positive means of notating unknown vs non-existance. Often `nil` will be used to indicate either of those concepts, but `nil` really means "undefined pointer". Extra effort must be taken during marshalling/unmarshalling. Also see 'omitempty' handling.
-
-Sadly, some languages, such as C#, have standard libraries that treat unknown and non-existance as the same thing leading to possible security vulnerabilities. (ref) Writing a RJSON library in that language will be ... challenging.
-
-C supports `NIL` but that distinctly a different thing: a pointer with no reference. Like *many* things in a low-level language like C, supporting null and/or non-existence is left as a excersize to the programmer.
-
-**TLDR:** So, if a RJSON program reads a RJSON document and writes that RJSON document back out:
-
-* If a field *does not exist* when it was read, and no change is made to that field, it *should not exist* when it is written.
-* If a field is `null` when it was read, and no change is made to that field, it should be `null` when it is written.
-
-### Numbers are in decimal not binary
-
-The JSON spec explicitly defines a "number" as involving the Base10 digits 0 to 9. It does not support Binary (Base2) or Hex (Base16 aka Base2^4). For integers, this is not critical. But for floating numbers, a binary floating point number cannot store the full set of numbers expressed by decimal floating point numbers. For example, one-fifth (1/5) is "0.2" in decimal. But in binary, one-fifth is a repeating number and can only be approximated. This is very similar to how one-third is a repeating number in decimal (0.3333...) and can only be stored as an approximation in decimal.
-
-(Trivia: one-third CAN be precisely be stored in Sumerian sexagesimal as ` .𒌋𒌋` (note the space before the period to denote nothing/zero.) That is the numbering system used by the extinct civilization of Ur. The numbering is Base60. However, one-seventh is a repeating number in sexagesimal. No numbering system can prevent all divisor flaws; but that is a mathematical discussion well outside the scope of this document.)
-
-This gives way to "subtle" rounding errors when converting between the decimal to binary.
-
-For many applications, this is a subtle distinction that does not mean much and is handled by good rounding algorithms. But if, for example, a RJSON document is used in a financial application, the numbers are technically decimal not binary should ideally be treated as such.
-
-Not all programming languages support decimal numbers. Some helpful references:
-
-| language    | ref |
-| ----------- | --------------------- |
-| Python      | there is a standard library called 'decimal' |
-| JavaScript  | https://www.npmjs.com/package/js-big-decimal |
-| Go          | https://pkg.go.dev/github.com/shopspring/decimal |
-
-### A JSON document's root element must either be an object or array
+### `FORMATTING 7` - A JSON document's root element must either be an object or array
 
 The JSON spec sort-of kind-of implies this. But RJSON is more explicit: the top-level structure is either an object or an array.
 
@@ -438,62 +281,90 @@ Bad RJSON (and possibly bad JSON, but we are not sure):
 true
 ```
 
-### An Object's field names may not repeat in the same level of that object
+### `NUMBERS 1` - Numbers use a capital E if using an exponent
 
 Good:
 
 ```json
 {
-  "id": "Joe"
+  "number": 2.345E20
 }
 ```
-
-```json
-{
-  "id": "Joe",
-  "pet": {
-    "id": "Mittens",
-    "type": "rabbit"
-  },
-  "addr": {
-    "detail": "1234 Main St.",
-    "id": "home"
-  }
-}
-```
-
-Though the name `id` shows up in three places, they are not at the same level in the same object, so that is okay.
 
 Bad RJSON (even though valid JSON):
 
 ```json
 {
-  "id": "Joe",
-  "id": "Joe"
+  "number": 2.345e20
 }
 ```
+
+*Do not use a lower-case 'e' for the exponent marker.*
+
+### `NUMBERS 2` - Numbers do not use the plus symbol if using a positive exponent
+
+Good:
 
 ```json
 {
-  "id": "Joe",
-  "id": "Larry"
+  "number": 2.345E20,
+  "small": 4.56E-10
 }
 ```
+
+Bad RJSON (even though valid JSON):
 
 ```json
 {
-  "id": "Joe",
-  "pet": {
-    "id": "Mittens",
-    "type": "rabbit",
-    "type": "domestic"
-  }
+  "number": 2.345E+20,
+  "small": 4.56E-10
 }
 ```
 
-This *might* seem like this rule violates rule #1: "Compatible with the JSON spec." However, it is this authors contention that it does not. If curious, I've discussed this subject in FAR TOO MUCH DETAIL in another document: [JSON_DUPLICATE_NAMES](JSON_DUPLICATE_NAMES.md)
+*The +20 for an exponent is allowed with JSON but not RJSON*
 
-### In a string, the `\U` escapement is not to be used.
+Bad RJSON **and** bad JSON:
+
+```json
+  "number": +2.345E20
+```
+
+*The JSON spec already forbids using a plus symbol for positive numbers.*
+
+### `NUMBERS 3` - If reading/writing RJSON documents, Number precision must be preserved.
+
+Decimal floating-point numbers have implied precision and it should not be discarded. For example:
+
+```json
+{
+  "a": 1,
+  "b": 1.000,
+  "c": 3.1415E20,
+  "d": 3.14150000E20,
+}
+```
+
+The values for "a", "b", "c", and "d" are different. "a" is exactly 1 but "b" is 1 to three decimal points. They may both have the same scalar value, but the precision (or *significance*) differs.
+
+### `NUMBERS 4` - Numbers are in decimal not binary
+
+The JSON spec explicitly defines a "number" as involving the Base10 digits 0 to 9. It does not support Binary (Base2) or Hex (Base16 aka Base2^4). For integers, this is not critical. But for floating numbers, a binary floating point number cannot store the full set of numbers expressed by decimal floating point numbers. For example, one-fifth (1/5) is "0.2" in decimal. But in binary, one-fifth is a repeating number and can only be approximated. This is very similar to how one-third is a repeating number in decimal (0.3333...) and can only be stored as an approximation in decimal.
+
+(Trivia: one-third CAN be precisely be stored in Sumerian sexagesimal as ` .𒌋𒌋` (note the space before the period to denote nothing/zero.) That is the numbering system used by the extinct civilization of Ur. The numbering is Base60. However, one-seventh is a repeating number in sexagesimal. No numbering system can prevent all divisor flaws; but that is a mathematical discussion well outside the scope of this document.)
+
+This gives way to "subtle" rounding errors when converting between the decimal to binary.
+
+For many applications, this is a subtle distinction that does not mean much and is handled by good rounding algorithms. But if, for example, a RJSON document is used in a financial application, the numbers are technically decimal not binary should ideally be treated as such.
+
+Not all programming languages support decimal numbers. Some helpful references:
+
+| language    | ref |
+| ----------- | --------------------- |
+| Python      | there is a standard library called 'decimal' |
+| JavaScript  | https://www.npmjs.com/package/js-big-decimal |
+| Go          | https://pkg.go.dev/github.com/shopspring/decimal |
+
+### `STRINGS 1` - In a string, the `\U` escapement is not to be used.
 
 The actual UTF-8 codepoints are to be inserted into the string.
 
@@ -523,7 +394,151 @@ Bad RJSON (even though valid JSON):
 
 *This rule applies to the name string as well.*
 
-### Defining a repeatable order for the fields of an object
+### `DATA TYPES 1` - Arrays are actually "lists" not "arrays"
+
+In Computer Science standard terminology, an "array" is a fixed list of items of the same type. However, in JSON, an "array" is neither fixed nor is it required to be of the same type. Ity is called an "array" for historic reasons: the javascript language also calls them arrays despite not being actual arrays.
+
+Here are two valid RJSON documents with differening sizes for the field "aaa":
+
+```json
+{
+  "aaa": [
+    1,
+    2,
+    3
+  ]
+}
+```
+
+```json
+{
+  "aaa": [
+    1,
+    2,
+    3,
+    4
+  ]
+}
+```
+
+Here is a valid RJSON document with mixed types in the field "aaa":
+
+```json
+{
+  "aaa": [
+    1,
+    null,
+    "hello",
+    false
+  ]
+}
+```
+
+### `DATA TYPES 2` - `null` represents "not known" or "unknown"
+
+In RJSON, `null` very specifically represents the database meaning commonly found in SQL specifications. It means that a value is not known. Or, to be explicit: it does NOT mean empty or does-not-exist.
+
+As a demonstration:
+
+```json
+{
+  "a": 0,
+  "c": null
+}
+```
+
+This above document shows that:
+
+- "a" is an empty integer. 
+- "b" does not exist. (aka "missing" or "undefined")
+- "c" is not known.
+
+These concepts are expressed differently in different languages:
+
+| concept         | JSON              | Python                | JavaScript    | Go                 |
+| --------------- | ----------------- | --------------------- | ------------- | ------------------ |
+| empty number    | `0`               | `Decimal("0")` or `0` | `0`           | `decimal.NewFromInt(3)` or `0` |
+| empty list      | `[]`              | `[]`                  | `[]`          | `make([]string, 0)` |
+| empty object    | `{}`              | `{}`                  | `{}`          | `map[string]interface{}{}` |
+| empty string    | `""`              | `""`                  | `''` or `""`  | `""` |
+| non-existance   | (field missing)   |                       | `undefined`   |  |
+| null / unknown  | `null`            | `None`                | `null`        |  |
+
+Python does not have a positive means of noting non-existance. However `obj.has_key(key)` can detect existance. And `del obj[key]` can remove existance.
+
+Go does not have a positive means of notating unknown vs non-existance. Often `nil` will be used to indicate either of those concepts, but `nil` really means "undefined pointer". Extra effort must be taken during marshalling/unmarshalling. Also see 'omitempty' handling.
+
+Sadly, some languages, such as C#, have standard libraries that treat unknown and non-existance as the same thing leading to possible security vulnerabilities. (ref) Writing a RJSON library in that language will be ... challenging.
+
+C supports `NIL` but that distinctly a different thing: a pointer with no reference. Like *many* things in a mid-level language like C, supporting null and/or non-existence is left as a excersize to the programmer.
+
+**TLDR:** So, if a RJSON program reads a RJSON document and writes that RJSON document back out:
+
+* If a field *does not exist* when it was read, and no change is made to that field, it *should not exist* when it is written.
+* If a field is `null` when it was read, and no change is made to that field, it should be `null` when it is written.
+
+### `DATA TYPES 3` - An Object's field names may not repeat in the same level of that object
+
+Good:
+
+```json
+{
+  "id": "Joe"
+}
+```
+
+```json
+{
+  "id": "Joe",
+  "pet": {
+    "id": "Mittens",
+    "type": "rabbit"
+  },
+  "addr": {
+    "detail": "1234 Main St.",
+    "id": "home"
+  }
+}
+```
+
+*Though the name `id` shows up in three places, they are not at the same level in the same object, so that is okay.*
+
+Bad RJSON (even though valid JSON):
+
+```json
+{
+  "id": "Joe",
+  "id": "Joe"
+}
+```
+
+*Duplicate keys ("id") not allowed in RJSON*
+
+```json
+{
+  "id": "Joe",
+  "id": "Larry"
+}
+```
+
+*Duplicate keys ("id") not allowed in RJSON*
+
+```json
+{
+  "id": "Joe",
+  "pet": {
+    "id": "Mittens",
+    "type": "rabbit",
+    "type": "domestic"
+  }
+}
+```
+
+*Duplicate keys ("type") in subtending "pet" object not allowed in RJSON*
+
+It *might* seem like this rule violates rule #1: "Compatible with the JSON spec." However, it is this author's contention that it does not. If curious, I've discussed this subject in FAR TOO MUCH DETAIL in another document: [JSON_DUPLICATE_NAMES](JSON_DUPLICATE_NAMES.md)
+
+### `DATA TYPES 3` - Use a repeatable order for the fields of an object
 
 The items in a JSON object are not placed in a particular order per the JSON spec.
 
@@ -583,6 +598,8 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
+*The "a" name should come before all the other fields because it is "lowest" in the sorting order*
+
 Please note that this is NOT the same thing as collation (aka "alphabetical order"). Collation cannot be used because it is contextual to the reader's locality/language. See the COLLATION spec for Unicode for many examples. Plus the COLLATION spec can (and does) change over time; which is not a desirable trait for a repeatable spec like RJSON.
 
 Good:
@@ -607,7 +624,7 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
-That last doc is bad because it is in alphabetical order per English rules; and not sorted by unicode code point values.
+*This doc object is bad because it is in alphabetical order per English rules; and is not sorted by unicode code point values.*
 
 ## Downsides to RJSON
 
