@@ -1,6 +1,6 @@
 # Does JSON allow duplicate names in an Object?
 
-This is a controversion subject that is discussed from time to time.
+This is a midly controversial subject that is discussed from time to time.
 
 ## TLDR
 
@@ -8,7 +8,7 @@ The JSON Specification does not forbid duplicate names in an object. This implie
 
 The JavaScript language that JSON is based on does forbid duplicate keys in objects. This implies that it is forbidden.
 
-And there is my crazy take: JSON allows duplicate names but all duplicates but the last are to be ignored.
+And there is my crazy take: JSON allows duplicate names but all duplicates but the last one are to be ignored.
 
 This document is my justification of my crazy take.
 
@@ -20,7 +20,7 @@ There are two data types in common usage for values-that-have-names.
 
 ### Ordered Associative Array: a sequence of key/value pairs.
 
-When an `associative array` is ordered, this data types allows and encourages duplicate names. Probably the most common used of an associative array on the Internet is the result of an HTML Form. For example,
+When an `associative array` is ordered, this data types allows and encourages duplicate names. Probably the most common use of an ordered associative array on the Internet is the result of an HTML Form. For example,
 
 ```html
 <html>
@@ -48,18 +48,19 @@ Because of the ordering, you can ask an ordered associative array to "get the se
 
 Most major languages support associative arrays, though sometimes only through third party libraries or as a sequence of tuples.
 
-Note: there is quite a bit of Python documentation that describes `dict`s as associative arrays (and they are a form of them) and then declare that "all associative arrays" require unique keys. I am shocked by this. For a correct reference, see *"Programming Language Pragmatics (Third Edition)"* chapter **7 - Data Types**. Or pretty much any computer science book.
+Note: there is quite a bit of Python documentation that describes `Dict` as an associative array (and it is a *form* of it) but then declare that "all associative arrays" require unique keys. I am shocked by this. For a correct reference, see *"Programming Language Pragmatics (Third Edition)"* chapter **7 - Data Types**. Or pretty much any computer science book on data types.
 
-### Mappings: an unordered list of values mapped to unique keys
+### Mapping: an unordered list of values mapped to unique keys
 
-These are also sometimes called:
+A `mapping` is also sometimes called:
+
  - `dictionary`
  - `map`
  - `record`
  - `struct`
  - `object`
 
-And, if all of the values are restricted to the same type, you could include `hash table` and `keyed list`.
+And, if all of the values are restricted to the same type, you could include `hash table`.
 
 Nearly all high-level languages support mappings natively.
 
@@ -75,9 +76,15 @@ In fact, the actual wording in the spec...
 
     `A collection of name/value pairs. In various languages, this is realized as an object, record, struct, dictionary, hash table, keyed list, or associative array.`
 
-mentions collection data types that are NOT neccesarily compatible with each other, such as `dictionary` and `hash table`.
+mentions various data types that are NOT neccesarily compatible with each other, such as `dictionary` and `keyed list`.
 
 I would argue that the JSON spec, by itself, cannot answer our question.
+
+The corresponding RFC for JSON, [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259#section-4) , says:
+
+     The names within an object SHOULD be unique.
+
+In the grammar of RFCs, SHOULD means "not required but strongly encourages". Again, it implies technical permission.
 
 ## Looking at common JSON usage
 
@@ -87,8 +94,9 @@ Details:
 
 | language   | data type used | language name for type | response to duplicates names |
 | ---------- | -------------- | ---------------------- | ---------------------------- |
-| JavaScript | Mapping | object | ... |
-| Python | Mapping | dict | ... |
+| JavaScript | Mapping | `object` | the object contains the last duplicate name's value |
+| Python | Mapping | `dict` using `json.load` or `json.loads` | the dict contains the last duplicate name's value |
+| Go | Mapping | `map[string]interface{}` using `json.Unmarshal` | the map contains the last duplicate name's value |
 
 (If your language is not in this table, feel free to send me a repo PR. Languages are in English alphabetical order; except that
 Javascript is at the top for historical context.)
@@ -100,6 +108,8 @@ The JSON spec does not require "ordering" OR "uniqueness" to the key/value pairs
 So, my take:
 
 **The SPEC implies that JSON should behave like a JavaScript object and ignore all but the last duplicate key if duplicate keys are found.**
+
+That is all I'm saying. I've used a lot of words to say a simple thing. Sorry about that.
 
 So,
 
@@ -145,9 +155,9 @@ assert {"Curly", "Moe", "Larry"} == x["actor"]  # order DOES NOT MATTER in a set
 
 I'm not convinced writing such a library would be useful. But, in theory, it could be done.
 
-### How does Flask handles Form POST input?
+### How does Flask handle Form POST input?
 
-Objviously, you can't use a `Dict` or `OrderedDict` to store those values. So, how is it handled in Flask (a python web server)?
+Obviously, you can't use a `dict` or `OrderedDict` to store those values. So, how is it handled in Flask (a python web server)?
 
 It is stored as a specialized class of the WTF libraries `Form` called `FlaskForm`. This class builds what they call a "multi dict" which gets an ordered list of values for any one key applied against a schema. So, using the example of:
 
@@ -165,4 +175,4 @@ assert request.form["actor"] == ["Larry", "Moe", "Curly"]
 assert request.form["year"] == ["1944"]
 ```
 
-Short answer: everything is always a list. Since the HTML form content is flat and does not support lists intrinically, this does not conflict with anything.
+Short answer: everything is always a list. Since the HTML form content is flat and does not support lists intrinsically, this does not conflict with anything.
