@@ -50,6 +50,8 @@ Bad RJSON (even though valid JSON):
 {"a": 3.2,"b": [],"c": false}
 ```
 
+*Indentation is expected before each name.*
+
 ```json
 {
     "a": 3.2,
@@ -57,6 +59,8 @@ Bad RJSON (even though valid JSON):
     "c": false
 }
 ```
+
+*The indentation is 4 spaces, but should be 2 spaces.*
 
 ### `FORMATTING 2` - For object key/value pair lines: indentation, field name (key), colon, exactly one space, start of value. 
 
@@ -79,6 +83,8 @@ Bad RJSON (even though valid JSON):
   "c":false
 }
 ```
+
+*A single space is expected after each colon.*
 
 ```json
 {
@@ -118,6 +124,8 @@ Bad RJSON (even though valid JSON):
 }
 ```
 
+*There should not be an extra space between the value and the comma.*
+
 ```json
 {
   "a": 3.2
@@ -129,6 +137,8 @@ Bad RJSON (even though valid JSON):
   ]
 }
 ```
+
+*The comma comes before the LINEFEED or indentation.*
 
 Not shown: adding white space at end of line also not allowed. But this is difficult to demonstrate using markdown.
 
@@ -228,7 +238,9 @@ contains 3 lines and a LINEFEED character at the end of each line. So, a total o
 
 ### `FORMATTING 7` - A JSON document's root element must either be an object or array
 
-The JSON spec sort-of kind-of implies this. But RJSON is more explicit: the top-level structure is either an object or an array.
+The JSON spec sort-of kind-of implies this with the words "JSON is built on two structures...".
+
+But RJSON is more explicit: the top-level structure is either an object or an array.
 
 Because of RJSON strict formatting, a reader need only look at the first character in a document to detect which type of root element is contained in the document. If the first character is a curly brace `{` then the document contains an object. If the first character is a left square bracket `[` then it is an array.
 
@@ -273,13 +285,19 @@ Bad RJSON (and possibly bad JSON, but we are not sure):
 42
 ```
 
+*This is a bare Number. RJSON does not allow this but JSON might or might not.*
+
 ```json
 "hello world"
 ```
 
+*This is a bare `string`. RJSON does not allow this but JSON might or might not.*
+
 ```json
 true
 ```
+
+*This is a bare boolean `true`. RJSON does not allow this but JSON might or might not.*
 
 ### `NUMBERS 1` - Numbers use a capital E if using an exponent
 
