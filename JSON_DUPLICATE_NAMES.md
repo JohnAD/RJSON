@@ -14,7 +14,7 @@ This document is my justification of my crazy take.
 
 ## Data Type Background
 
-JSON is not a "Data Type". Nor is it a "collection" in the Computer Science meaning of the word. It is meant to be a serialization of a data type that can contain values that have names.
+JSON is not a "Data Type". Nor is it a "collection" in the Computer Science meaning of the word. It is meant to be a serialization of a data that can contain values that have names.
 
 There are two data types in common usage for values-that-have-names.
 
@@ -50,9 +50,9 @@ Most major languages support ordered associative arrays, though sometimes only t
 
 Note: there is quite a few of Python web pages that describes `dict` as an associative array (and it is a *subtype*). They then also declare that "**all** associative arrays" require unique keys. **I am shocked by this.** For a correct reference, see *"Programming Language Pragmatics (Third Edition)"* by Michael Scott; see chapter "7 - Data Types". Or pretty much any computer science book on data types.
 
-### Mapping: an unordered set of values mapped by unique keys
+### Maps: an unordered set of values mapped by unique keys
 
-A `mapping` is also sometimes called:
+A `Map` or `mapping` is also sometimes called:
 
  - `dictionary`
  - `map`
@@ -76,7 +76,7 @@ In fact, the actual wording in the spec...
 
     `A collection of name/value pairs. In various languages, this is realized as an object, record, struct, dictionary, hash table, keyed list, or associative array.`
 
-mentions various data types that are NOT neccesarily compatible with each other, such as `dictionary` and `keyed list`.
+mentions various data types that are NOT necessarily compatible with each other, such as `dictionary` and `keyed list`.
 
 I would argue that the JSON spec, by itself, cannot answer our question.
 
@@ -84,11 +84,11 @@ In fact, the corresponding RFC for JSON, [RFC-8259](https://www.rfc-editor.org/r
 
      The names within an object SHOULD be unique.
 
-In the grammar of RFCs, SHOULD means "not required strongly encouraged". Again, this implies technical permission.
+In the grammar of RFCs, SHOULD means "not required but strongly encouraged". Again, this implies technical permission.
 
 ## Looking at common JSON usage
 
-In every language I've seen so far, JSON has been treated as a mapping when it is deserialized into an internal collection.
+Yet, in every language I've seen so far, JSON has been treated as a mapping when it is deserialized into an internal collection.
 
 Details:
 
@@ -133,11 +133,12 @@ Because all but the last duplicate key should be ignored, it is critical that an
 
 I imagine most libraries handle this correctly already, but I bring this up for the sake of completeness.
 
-### Can you create a collection / data type that DOES match JSON spec
+### Can you create a collection / data type that DOES match JSON spec?
 
 Could someone create a collection type that matches the open-ended JSON spec? In theory, yes. Perhaps it would be called an `associative set` and would be defined as "an unordered set of name/value pairs". With it you could query some very limited data. Theoretical example in Python:
 
 ```python
+# the following library is theoretical
 from associativeset import AS
 
 x = AS()

@@ -6,17 +6,17 @@
 
 In order of importance:
 
-1. Compatible with the JSON spec. In the end, any JSON parser can read a RJSON document as simple JSON. The "repeatable" part is simply in how the JSON document is serialized (expressed).
-2. An object with the same content will ALWAYS create exactly the same serialization of the document.
-3. Human readable still.
-4. The JSON will be line-oriented for easy tracking of differences in utilities such as GIT.
+1. It is compatible with the JSON spec. In the end, any JSON parser can read a RJSON document as simply JSON. The "repeatable" part is in the strict manner of the formatting.
+2. An object with the same content will ALWAYS create exactly the same serialization of the document. Two document files containing the same data will create the same hash code number.
+3. It should be human readable.
+4. The JSON should be line-oriented for easy tracking of differences in utilities such as GIT.
 
 Easy human *writability* is NOT a goal. It should be fairly easy for a person to read RJSON; but writing is very strict. Enough so that having a human write anything non-trivial in RJSON is going to be frustrating.
 
 The goals are to be met by a set of rules that:
 
-* state the standard for layout and indentiation, and
-* more precisely stating definitions of some elements.
+* state the standard for layout and indentation, and
+* more precisely state the definitions of some elements than the original spec.
 
 ## Target Libraries
 
@@ -24,11 +24,11 @@ The goals are to be met by a set of rules that:
 2. Go
 3. Python
 
-It would be good for support in other languages, but this author is concentrating strictly on those three.
+It would be good to have support in other languages, but this author is concentrating strictly on those three.
 
 Because RJSON is about the expression of standard JSON, the libraries need only influence the serialization. There is no need for handling deserialization.
 
-However, it is my intention to also write a linter in Go.
+However, it is my intention to also write a linter in Go at some point.
 
 ## The Rules
 
@@ -93,6 +93,8 @@ Bad RJSON (even though valid JSON):
   "c" : false
 }
 ```
+
+*There cannot be spacing before the name and the colon.*
 
 ### `FORMATTING 3` - For object and arrays entries, the end of a value ends the line (via LINEFEED or COMMA LINEFEED) 
 
@@ -291,7 +293,7 @@ Bad RJSON (and possibly bad JSON, but we are not sure):
 "hello world"
 ```
 
-*This is a bare `string`. RJSON does not allow this but JSON might or might not.*
+*This is a bare string. RJSON does not allow this but JSON might or might not.*
 
 ```json
 true
@@ -414,9 +416,13 @@ Bad RJSON (even though valid JSON):
 
 ### `DATA TYPES 1` - Arrays are actually "lists" not "arrays"
 
-In Computer Science standard terminology, an "array" is a fixed list of items of the same type. However, in JSON, an "array" is neither fixed nor is it required to be of the same type. Ity is called an "array" for historic reasons: the javascript language also calls them arrays despite not being actual arrays.
+In Computer Science standard terminology, an "array" is a fixed list of items of the same type. However, in JSON, an "array" is neither fixed nor is it required to be of the same type. 
 
-Here are two valid RJSON documents with differening sizes for the field "aaa":
+It is called an "array" for historic reasons: the JavaScript language also calls them arrays despite not being actual arrays in JavaScript either. The reason for this in JavaScript is not known to us. Perhaps the lists are stored using an array-of-pointers in the underlying interpreter; but that would be an hidden implementation detail not a language spec detail.
+
+Here are examples:
+
+Two valid JSON documents with differening sizes for the field "aaa":
 
 ```json
 {
@@ -439,7 +445,7 @@ Here are two valid RJSON documents with differening sizes for the field "aaa":
 }
 ```
 
-Here is a valid RJSON document with mixed types in the field "aaa":
+A valid JSON document with mixed types in the field "aaa":
 
 ```json
 {
@@ -482,18 +488,18 @@ These concepts are expressed differently in different languages:
 | non-existance   | (field missing)   |                       | `undefined`   |  |
 | null / unknown  | `null`            | `None`                | `null`        |  |
 
-Python does not have a positive means of noting non-existance. However `obj.has_key(key)` can detect existance. And `del obj[key]` can remove existance.
+Python does not have a positive means of noting non-existance. However `key in obj` can detect existance. And `del obj[key]` can remove existance.
 
 Go does not have a positive means of notating unknown vs non-existance. Often `nil` will be used to indicate either of those concepts, but `nil` really means "undefined pointer". Extra effort must be taken during marshalling/unmarshalling. Also see 'omitempty' handling.
 
 Sadly, some languages, such as C#, have standard libraries that treat unknown and non-existance as the same thing leading to possible security vulnerabilities. (ref) Writing a RJSON library in that language will be ... challenging.
 
-C supports `NIL` but that distinctly a different thing: a pointer with no reference. Like *many* things in a mid-level language like C, supporting null and/or non-existence is left as a excersize to the programmer.
+C supports `NIL` but that is distinctly a pointer with no reference. Like *many* things in a mid-level language like C, supporting null and/or non-existence is left as a exersize to the programmer.
 
-**TLDR:** So, if a RJSON program reads a RJSON document and writes that RJSON document back out:
+**TLDR:** So, if a RJSON library or program reads a RJSON document and writes that RJSON document back out:
 
-* If a field *does not exist* when it was read, and no change is made to that field, it *should not exist* when it is written.
-* If a field is `null` when it was read, and no change is made to that field, it should be `null` when it is written.
+* If a field *does not exist* when it was read, and no change is made to that field, it is not written out.
+* If a field is `null` when it was read, and no change is made to that field, it should remain `null` when it is written.
 
 ### `DATA TYPES 3` - An Object's field names may not repeat in the same level of that object
 
@@ -554,7 +560,7 @@ Bad RJSON (even though valid JSON):
 
 *Duplicate keys ("type") in subtending "pet" object not allowed in RJSON*
 
-It *might* seem like this rule violates rule #1: "Compatible with the JSON spec." However, it is this author's contention that it does not. If curious, I've discussed this subject in FAR TOO MUCH DETAIL in another document: [JSON_DUPLICATE_NAMES](JSON_DUPLICATE_NAMES.md)
+It *might* seem like this rule violates goal #1: "Compatible with the JSON spec." However, it is this author's contention that it does not. If curious, I've discussed this subject in FAR TOO MUCH DETAIL in another document: [JSON_DUPLICATE_NAMES](JSON_DUPLICATE_NAMES.md)
 
 ### `DATA TYPES 3` - Use a repeatable order for the fields of an object
 
