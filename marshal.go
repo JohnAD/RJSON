@@ -43,7 +43,7 @@ func appendIndent(state *MarshalState, offset int) {
 func Marshal(v interface{}) ([]byte, error) {
 	state := MarshalState{
 		Levels: [MaxDepth]MarshalLevel{
-			MarshalLevel{
+			{
 				Value:        v,
 				Type:         UNKNOWN,
 				Keys:         []string{},
@@ -62,16 +62,30 @@ func nonRecursiveMarshal(state *MarshalState) error {
 		current := state.Levels[state.CurrentLevel]
 		val := reflect.ValueOf(current.Value)
 		switch val.Kind() {
-		case reflect.String:
-			handleSimple(state, val)
+		case reflect.String, reflect.Float32, reflect.Float64, reflect.Bool, reflect.Interface, reflect.Invalid:
+			err := handleSimple(state, val)
+			if err != nil {
+				return err
+			}
 			finishLevel(state)
 		case reflect.Map:
 			err := handleMap(state)
 			if err != nil {
 				return err
 			}
+		case reflect.Struct:
+			switch current.Value.(type) {
+			case RJsonElement:
+				err := handleRJSON(state)
+				if err != nil {
+					return err
+				}
+				finishLevel(state)
+			default:
+				return fmt.Errorf("unsupported type %v", val.Type())
+			}
 		default:
-			return fmt.Errorf("unsupported type: %T", current.Value)
+			return fmt.Errorf("unsupported type: %T  [%v]", current.Value, val.Kind())
 		}
 	}
 	state.Buf = append(state.Buf, "\n"...)
@@ -91,13 +105,49 @@ func finishLevel(state *MarshalState) {
 	state.CurrentLevel--
 }
 
-func handleSimple(state *MarshalState, val reflect.Value) {
+// handleSimple handles the "simple generic" case of JSON values. That is, that which is
+// Unmarshalled on a generic interface{} by the `json` lib AND is not a structure (like array
+// or map).
+func handleSimple(state *MarshalState, val reflect.Value) error {
 	switch val.Kind() {
 	case reflect.String:
 		state.Buf = strconv.AppendQuote(state.Buf, val.String())
+	case reflect.Float32, reflect.Float64:
+		state.Buf = strconv.AppendFloat(state.Buf, val.Float(), 'f', -1, 64)
+	case reflect.Bool:
+		state.Buf = strconv.AppendBool(state.Buf, val.Bool())
+	case reflect.Interface:
+		if val.IsNil() {
+			state.Buf = append(state.Buf, "null"...)
+		}
+		return fmt.Errorf("unsupported non-nil type: %T", val)
+	case reflect.Invalid:
+		state.Buf = append(state.Buf, "null"...)
 	default:
-		// no nothing
+		return fmt.Errorf("unsupported non-nil type: %T", val)
 	}
+	return nil
+}
+
+func handleRJSON(state *MarshalState) error {
+	level := &state.Levels[state.CurrentLevel]
+	elem := level.Value.(RJsonElement)
+	switch elem.kind {
+	// TODO: add maps and arrays next
+	case String:
+		state.Buf = strconv.AppendQuote(state.Buf, elem.str)
+	case Number:
+		state.Buf = append(state.Buf, elem.num.String()...)
+	case True:
+		state.Buf = append(state.Buf, "true"...)
+	case False:
+		state.Buf = append(state.Buf, "false"...)
+	case Null:
+		state.Buf = append(state.Buf, "null"...)
+	default:
+		return fmt.Errorf("unsupported RJSON type %s", elem.kind.String())
+	}
+	return nil
 }
 
 func handleMap(state *MarshalState) error {
