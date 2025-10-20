@@ -24,11 +24,15 @@ The goals are to be met by a set of rules that:
 2. Go
 3. Python
 
-It would be good to have support in other languages, but this author is concentrating strictly on those three.
+It would be good to have support in other languages, but this author is concentrating strictly on those three, starting with Go.
 
 Because RJSON is about the expression of standard JSON, the libraries need only influence the serialization. There is no need for handling deserialization.
 
 However, it is my intention to also write a linter in Go at some point.
+
+## Documentation
+
+- [Documentation for Go](GODOC.md)
 
 ## The Rules
 

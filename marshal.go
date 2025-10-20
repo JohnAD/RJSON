@@ -1,4 +1,4 @@
-package RJSON
+package main
 
 import (
 	"fmt"
